@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pyrotheon PI Buyback</title>
+<meta name="description" content="Pyrotheon Industries buys Rocket Fuel, Plasmoids and Electrolytes at live Jita prices. Instant quotes, eight delivery hubs.">
+<meta property="og:title" content="Pyrotheon Industries · PI Buyback">
+<meta property="og:description" content="We buy Rocket Fuel, Plasmoids and Electrolytes at live Jita prices. Get an instant quote.">
+<meta name="theme-color" content="#7cc8ff">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 34 34'%3E%3Cpath d='M17 3 C22 9 25 14 22.5 19.5 C21.5 17 19.5 16 18.5 15.5 C19 18.5 17.5 21 15 22.5 C15.5 20.5 14.5 19 13.2 18.2 C12.6 21 13.6 24.5 17 28 C10.5 27 8.5 21.5 9.5 17 C10.6 12 15.5 9 17 3 Z' fill='%237cc8ff'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Layout: one narrow column of operational panels. Rates up top, quote tool centre, hubs and rules below. Single dark theme (space ops console). */
+:root {
+  --bg: #070c14;
+  --panel: #0d1624;
+  --panel-2: #111d2f;
+  --line: #1d2d44;
+  --ink: #e6eef8;
+  --ink-2: #9fb2c8;
+  --ink-3: #6a7f98;
+  --ice: #7cc8ff;
+  --ice-strong: #a9dcff;
+  --ice-dim: rgba(124, 200, 255, 0.12);
+  --ember: #ffb36b;
+  --ember-dim: rgba(255, 179, 107, 0.12);
+  --good: #6fe0a8;
+  --font-display: "Chakra Petch", "Rajdhani", "Segoe UI", sans-serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background:
+    radial-gradient(1200px 500px at 85% -10%, rgba(124, 200, 255, 0.10), transparent 60%),
+    radial-gradient(800px 400px at -10% 0%, rgba(255, 179, 107, 0.05), transparent 60%),
+    var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--ice); }
+.wrap { max-width: 1040px; margin: 0 auto; padding: 0 20px; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; letter-spacing: 0.01em; }
+.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+:focus-visible { outline: 2px solid var(--ice); outline-offset: 2px; }
+
+/* Header */
+header.top { border-bottom: 1px solid var(--line); }
+header.top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-top: 16px; padding-bottom: 16px; flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: 12px; }
+.brand svg { flex: none; }
+.brand-name { font-family: var(--font-display); font-weight: 700; letter-spacing: 0.18em; font-size: 15px; }
+.brand-tag { font-size: 12px; color: var(--ink-3); letter-spacing: 0.08em; text-transform: uppercase; }
+.asof { font-size: 13px; color: var(--ink-2); display: flex; align-items: center; gap: 8px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ink-3); flex: none; }
+.dot.live { background: var(--good); box-shadow: 0 0 0 3px rgba(111, 224, 168, 0.15); }
+.dot.stale { background: var(--ember); box-shadow: 0 0 0 3px rgba(255, 179, 107, 0.15); }
+.asof button { padding: 4px 10px; font-size: 12px; }
+.banner { display: none; margin-top: 14px; padding: 10px 14px; border-radius: 8px; border: 1px solid rgba(255, 179, 107, 0.4); background: var(--ember-dim); color: var(--ember); font-size: 14px; }
+.banner.show { display: block; }
+
+/* Hero */
+.hero { padding: 44px 0 28px; display: grid; gap: 14px; }
+.hero h1 { font-size: clamp(30px, 5vw, 46px); line-height: 1.08; font-weight: 700; max-width: 22ch; }
+.hero h1 em { font-style: normal; color: var(--ice); }
+.hero p { margin: 0; color: var(--ink-2); max-width: 62ch; font-size: 17px; }
+
+/* Rate cards */
+.rates { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.rate { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 18px; display: grid; gap: 14px; position: relative; overflow: hidden; }
+.rate::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 3px; background: var(--ice); }
+.rate.p2::before { background: var(--ember); }
+.rate-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.rate-head h3 { font-size: 20px; font-weight: 600; }
+.tier { font-size: 12px; color: var(--ink-3); letter-spacing: 0.06em; text-transform: uppercase; }
+.pill { font-family: var(--font-mono); font-size: 13px; font-weight: 500; padding: 3px 9px; border-radius: 999px; background: var(--ice-dim); color: var(--ice-strong); border: 1px solid rgba(124, 200, 255, 0.35); white-space: nowrap; }
+.rate.p2 .pill { background: var(--ember-dim); color: var(--ember); border-color: rgba(255, 179, 107, 0.35); }
+.pay { display: grid; gap: 2px; }
+.pay .label { font-size: 12px; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.06em; }
+.pay .big { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: 28px; font-weight: 500; }
+.pay .big small { font-size: 14px; color: var(--ink-2); margin-left: 4px; }
+.facts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; border-top: 1px solid var(--line); padding-top: 12px; font-size: 13px; }
+.facts dt { color: var(--ink-3); }
+.facts dd { margin: 0; font-family: var(--font-mono); font-variant-numeric: tabular-nums; color: var(--ink); }
+.note-tag { font-size: 12px; color: var(--ink-3); }
+.note-tag.warn { color: var(--ember); }
+
+/* Sections */
+section.block { margin-top: 40px; }
+.section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+.section-head h2 { font-size: 24px; font-weight: 600; }
+.section-head p { margin: 0; color: var(--ink-2); font-size: 14px; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; }
+
+/* Quote tool */
+.quote { display: grid; grid-template-columns: 1.05fr 1fr; }
+.quote > div { padding: 22px; display: grid; gap: 16px; align-content: start; }
+.quote > div + div { border-left: 1px solid var(--line); background: var(--panel-2); border-radius: 0 12px 12px 0; }
+label.lbl { display: block; font-size: 13px; color: var(--ink-2); margin-bottom: 6px; font-weight: 500; }
+textarea, input[type="text"], select {
+  width: 100%; background: #08111d; color: var(--ink); border: 1px solid var(--line); border-radius: 8px;
+  font: 14px/1.45 var(--font-mono); padding: 10px 12px;
+}
+textarea { min-height: 112px; resize: vertical; }
+textarea:focus, input:focus, select:focus { border-color: var(--ice); outline: none; box-shadow: 0 0 0 3px var(--ice-dim); }
+.qty-grid { display: grid; gap: 10px; }
+.qty-row { display: grid; grid-template-columns: 1fr 150px; gap: 10px; align-items: center; }
+.qty-row span { font-size: 15px; }
+.qty-row input { text-align: right; font-variant-numeric: tabular-nums; }
+.btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+button {
+  font: 600 14px var(--font-body); border-radius: 8px; padding: 9px 14px; cursor: pointer;
+  border: 1px solid var(--line); background: var(--panel-2); color: var(--ink);
+}
+button:hover { border-color: var(--ice); }
+button.primary { background: var(--ice); color: #04121f; border-color: var(--ice); }
+button.primary:hover { background: var(--ice-strong); }
+.parse-msg { font-size: 13px; color: var(--ink-3); min-height: 1.2em; }
+.parse-msg.ok { color: var(--good); }
+.parse-msg.err { color: var(--ember); }
+
+.lines { width: 100%; border-collapse: collapse; font-size: 14px; }
+.lines th { text-align: left; font-weight: 500; color: var(--ink-3); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; padding: 0 0 8px; }
+.lines td { padding: 7px 0; border-top: 1px solid var(--line); }
+.lines td.r, .lines th.r { text-align: right; }
+.lines td.r { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.lines tr.empty td { color: var(--ink-3); }
+.total { display: grid; gap: 4px; padding: 16px; border: 1px solid rgba(124, 200, 255, 0.35); border-radius: 10px; background: var(--ice-dim); }
+.total .label { font-size: 12px; color: var(--ink-2); text-transform: uppercase; letter-spacing: 0.06em; }
+.total .big { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: clamp(24px, 4vw, 32px); font-weight: 500; color: var(--ice-strong); overflow-wrap: anywhere; }
+.total .sub { font-size: 13px; color: var(--ink-2); }
+
+.contract { display: grid; gap: 0; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.c-row { display: grid; grid-template-columns: 128px 1fr auto; gap: 10px; align-items: center; padding: 10px 12px; font-size: 14px; }
+.c-row + .c-row { border-top: 1px solid var(--line); }
+.c-row .k { color: var(--ink-3); font-size: 13px; }
+.c-row .v { font-family: var(--font-mono); overflow-wrap: anywhere; }
+.c-row select { padding: 6px 8px; font-size: 13px; }
+.c-row button { padding: 5px 10px; font-size: 12px; }
+.copied { color: var(--good) !important; border-color: var(--good) !important; }
+
+/* Steps */
+.steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; counter-reset: step; }
+.step { padding: 18px; display: grid; gap: 6px; align-content: start; }
+.step .n { font-family: var(--font-mono); color: var(--ice); font-size: 13px; }
+.step h3 { font-size: 17px; font-weight: 600; }
+.step p { margin: 0; color: var(--ink-2); font-size: 14px; }
+
+/* Hubs */
+.hubs { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+.hub { padding: 14px 16px; display: grid; gap: 4px; }
+.hub .sys { font-family: var(--font-display); font-weight: 600; font-size: 17px; display: flex; align-items: center; gap: 8px; }
+.hub .where { font-size: 13px; color: var(--ink-2); }
+.sec { font-family: var(--font-mono); font-size: 11px; padding: 1px 6px; border-radius: 4px; border: 1px solid var(--line); color: var(--ink-2); }
+.sec.hs { color: var(--good); border-color: rgba(111, 224, 168, 0.35); }
+.sec.ns { color: #ff8a8a; border-color: rgba(255, 138, 138, 0.35); }
+
+/* Rules */
+.rules { padding: 6px 22px; }
+.rules ul { margin: 0; padding: 0; list-style: none; }
+.rules li { padding: 12px 0; display: grid; grid-template-columns: 22px 1fr; gap: 8px; color: var(--ink-2); font-size: 15px; }
+.rules li + li { border-top: 1px solid var(--line); }
+.rules li::before { content: "▸"; color: var(--ice); }
+.rules strong { color: var(--ink); font-weight: 600; }
+
+footer { margin: 48px 0 36px; padding-top: 18px; border-top: 1px solid var(--line); color: var(--ink-3); font-size: 13px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+
+@media (max-width: 860px) {
+  .rates { grid-template-columns: 1fr; }
+  .quote { grid-template-columns: 1fr; }
+  .quote > div + div { border-left: 0; border-top: 1px solid var(--line); border-radius: 0 0 12px 12px; }
+  .steps { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 480px) {
+  .steps { grid-template-columns: 1fr; }
+  .qty-row { grid-template-columns: 1fr 120px; }
+  .c-row { grid-template-columns: 1fr auto; }
+  .c-row .k { grid-column: 1 / -1; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  button, textarea, input, select { transition: border-color .15s, box-shadow .15s, background .15s; }
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand">
+      <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true">
+        <defs>
+          <linearGradient id="g" x1="0" y1="1" x2="0" y2="0">
+            <stop offset="0" stop-color="#ffb36b"/>
+            <stop offset="0.55" stop-color="#7cc8ff"/>
+            <stop offset="1" stop-color="#a9dcff"/>
+          </linearGradient>
+        </defs>
+        <polygon points="17,2 31,10 31,24 17,32 3,24 3,10" fill="none" stroke="#1d2d44" stroke-width="1.5"/>
+        <path d="M17 7 C21 12 23 15 21.5 19 C21 17 19.5 16 18.5 15.5 C19 18.5 17.5 21 15 22.5 C15.5 20.5 14.5 19 13.2 18.2 C12.6 21 13.6 24.5 17 27 C11.5 26 9.5 21.5 10.5 17.5 C11.6 13 15.5 11 17 7 Z" fill="url(#g)"/>
+      </svg>
+      <div>
+        <div class="brand-name">PYROTHEON INDUSTRIES</div>
+        <div class="brand-tag">Fire of the gods · PI Buyback</div>
+      </div>
+    </div>
+    <div class="asof"><span class="dot" id="live-dot" aria-hidden="true"></span><span id="asof-text" role="status" aria-live="polite">Loading live Jita prices…</span><button type="button" id="btn-refresh">Refresh</button></div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="hero">
+    <h1>We buy <em>Rocket Fuel</em>, Plasmoids and Electrolytes.</h1>
+    <p id="hero-sub">Paid in ISK at a set percentage of the live Jita buy price. Get a quote below, then make a private item exchange contract to <strong id="hero-to">…</strong> at any of our eight delivery hubs.</p>
+  </div>
+  <div class="banner" id="banner" role="alert"></div>
+
+  <div class="rates" id="rates" aria-label="Current buyback rates"></div>
+
+  <section class="block" aria-labelledby="quote-h">
+    <div class="section-head">
+      <h2 id="quote-h">Get a quote</h2>
+      <p>Paste from your hangar or type quantities. The contract details fill in for you.</p>
+    </div>
+    <div class="panel quote">
+      <div>
+        <div>
+          <label class="lbl" for="paste">Paste from your inventory</label>
+          <textarea id="paste" spellcheck="false" placeholder="Select items in your hangar, Ctrl+C, then paste here.&#10;Rocket Fuel&#9;24,000&#9;Refined Commodities - Tier 2&#10;Plasmoids&#9;150,000&#9;Basic Commodities - Tier 1"></textarea>
+        </div>
+        <div class="btn-row">
+          <button type="button" class="primary" id="btn-parse">Read pasted items</button>
+          <button type="button" id="btn-clear">Clear</button>
+        </div>
+        <div class="parse-msg" id="parse-msg" role="status" aria-live="polite"></div>
+        <div>
+          <label class="lbl">Or enter quantities</label>
+          <div class="qty-grid" id="qty-grid"></div>
+        </div>
+      </div>
+      <div>
+        <table class="lines" aria-label="Quote lines">
+          <thead><tr><th>Item</th><th class="r">Qty</th><th class="r">ISK / unit</th><th class="r">Subtotal</th></tr></thead>
+          <tbody id="lines"></tbody>
+        </table>
+        <div class="total">
+          <div class="label">You receive</div>
+          <div class="big" id="total-isk">0 ISK</div>
+          <div class="sub" id="total-sub">0 m³ to deliver</div>
+        </div>
+        <div>
+          <label class="lbl">Your contract</label>
+          <div class="contract">
+            <div class="c-row"><span class="k">Type</span><span class="v">Item Exchange</span><span></span></div>
+            <div class="c-row"><span class="k">Availability</span><span class="v" id="c-to">Private</span><button type="button" data-copy="to">Copy name</button></div>
+            <div class="c-row"><span class="k"><label for="hub-select">Location</label></span><select id="hub-select"></select><span></span></div>
+            <div class="c-row"><span class="k">I will receive</span><span class="v" id="c-isk">0</span><button type="button" data-copy="isk">Copy ISK</button></div>
+            <div class="c-row"><span class="k">Expiration</span><span class="v" id="c-exp">…</span><span></span></div>
+            <div class="c-row"><span class="k">Description</span><span class="v" id="c-desc">…</span><button type="button" data-copy="desc">Copy</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" aria-labelledby="how-h">
+    <div class="section-head"><h2 id="how-h">How it works</h2></div>
+    <div class="steps">
+      <div class="panel step"><span class="n">01</span><h3>Quote</h3><p>Paste your items above. The quote uses live Jita buy prices, refreshed every 5 minutes.</p></div>
+      <div class="panel step"><span class="n">02</span><h3>Deliver</h3><p>Move your goods to any hub below. Small or large lots are both welcome.</p></div>
+      <div class="panel step"><span class="n">03</span><h3>Contract</h3><p id="step3">Make a private item exchange contract to us for the quoted ISK.</p></div>
+      <div class="panel step"><span class="n">04</span><h3>Get paid</h3><p>We accept contracts that match the quote, and the ISK lands in your wallet.</p></div>
+    </div>
+  </section>
+
+  <section class="block" aria-labelledby="hubs-h">
+    <div class="section-head">
+      <h2 id="hubs-h">Delivery hubs</h2>
+      <p>Same rates at every hub.</p>
+    </div>
+    <div class="hubs" id="hubs"></div>
+  </section>
+
+  <section class="block" aria-labelledby="rules-h">
+    <div class="section-head"><h2 id="rules-h">Contract rules</h2></div>
+    <div class="panel rules">
+      <ul id="rules"></ul>
+    </div>
+  </section>
+
+  <footer>
+    <span>Pyrotheon Industries · Brave</span>
+    <span id="foot-contact">Questions: EVE-mail …</span>
+  </footer>
+</main>
+
+<script>
+/* ====================================================================
+   BUYBACK SETTINGS: edit these values to change rates or hubs.
+   rate      = share of the live Jita buy price you pay (1.05 = 105%).
+   tolerance = how far a contract may sit above the live quote and still
+               be accepted (0.02 = 2%), to cover price moves between
+               contract creation and acceptance.
+   Live prices: highest buy order at Jita 4-4, from EVE's ESI market API,
+   with Fuzzwork Market as a backup source.
+   ==================================================================== */
+const CONFIG = {
+  contractTo: "Wolfman Bridges",
+  expirationText: "1 week or longer",
+  tolerance: 0.02,
+  refreshMinutes: 5,
+  jitaStationId: 60003760,
+  forgeRegionId: 10000002,
+  items: [
+    { key: "rf", name: "Rocket Fuel",  tier: "P2 · Refined Commodity", typeId: 9830, volume: 0.75, rate: 0.95, cls: "p2" },
+    { key: "pl", name: "Plasmoids",    tier: "P1 · Basic Commodity",   typeId: 2389, volume: 0.19, rate: 1.05, cls: "p1" },
+    { key: "el", name: "Electrolytes", tier: "P1 · Basic Commodity",   typeId: 2390, volume: 0.19, rate: 1.05, cls: "p1" }
+  ],
+  hubs: [
+    { sys: "Jita",    sec: "hs", where: "Jita IV - Moon 4 - Caldari Navy Assembly Plant" },
+    { sys: "Amarr",   sec: "hs", where: "Amarr VIII (Oris) - Emperor Family Academy" },
+    { sys: "Dodixie", sec: "hs", where: "Dodixie IX - Moon 20 - Federation Navy Assembly Plant" },
+    { sys: "Rens",    sec: "hs", where: "Rens VI - Moon 8 - Brutor Tribe Treasury" },
+    { sys: "Hek",     sec: "hs", where: "Hek VIII - Moon 12 - Boundless Creation Factory" },
+    { sys: "C-J6MT",  sec: "ns", where: "Any station or structure in system" },
+    { sys: "UALX-3",  sec: "ns", where: "Any station or structure in system" },
+    { sys: "HY-RWO",  sec: "ns", where: "Any station or structure in system" }
+  ],
+  example: { rf: 24000, pl: 150000, el: 150000 }
+};
+
+/* ---------- pure helpers ---------- */
+function unitPay(item) { return item.jitaBuy ? Math.round(item.jitaBuy * item.rate * 100) / 100 : 0; }
+function computeQuote(items, qty) {
+  const lines = items.map(it => {
+    const q = Math.max(0, Math.floor(qty[it.key] || 0));
+    const unit = unitPay(it);
+    return { item: it, qty: q, unit, subtotal: q * unit, m3: q * it.volume };
+  });
+  const total = Math.floor(lines.reduce((s, l) => s + l.subtotal, 0));
+  const m3 = lines.reduce((s, l) => s + l.m3, 0);
+  return { lines, total, m3 };
+}
+function parsePaste(text, items) {
+  const out = {}; let matched = 0; const unknown = [];
+  for (const raw of text.split(/\r?\n/)) {
+    const line = raw.trim(); if (!line) continue;
+    const it = items.find(i => line.toLowerCase().includes(i.name.toLowerCase()));
+    if (!it) { unknown.push(line.split("\t")[0].slice(0, 40)); continue; }
+    let q = null;
+    const cols = line.split("\t");
+    if (cols.length > 1) {
+      const c = cols[1].replace(/[\s,. ']/g, "");
+      if (/^\d+$/.test(c)) q = parseInt(c, 10);
+    }
+    if (q === null) {
+      const rest = line.replace(new RegExp(it.name, "i"), " ").replace(/tier\s*\d/ig, " ").replace(/[\d.,]+\s*(m3|m³|isk)/ig, " ");
+      const m = rest.match(/\d[\d,. ' ]*/);
+      q = m ? parseInt(m[0].replace(/[^\d]/g, ""), 10) : 1;
+    }
+    out[it.key] = (out[it.key] || 0) + q; matched++;
+  }
+  return { qty: out, matched, unknown };
+}
+/* Highest buy order at Jita 4-4 from a list of ESI market orders. */
+function bestJitaBuy(orders, stationId) {
+  let best = 0;
+  for (const o of orders) if (o.is_buy_order !== false && o.location_id === stationId && o.price > best) best = o.price;
+  return best || null;
+}
+const fmt = n => n.toLocaleString("en-US", { maximumFractionDigits: 2 });
+const fmtInt = n => Math.floor(n).toLocaleString("en-US");
+function shortIsk(n) {
+  if (n >= 1e9) return (n / 1e9).toFixed(2) + "b";
+  if (n >= 1e6) return (n / 1e6).toFixed(2) + "m";
+  if (n >= 1e3) return (n / 1e3).toFixed(1) + "k";
+  return String(n);
+}
+function eveTime(d) {
+  return d.toISOString().slice(11, 16) + " EVE";
+}
+function eveStamp(d) {
+  return d.toISOString().slice(0, 16).replace("T", " ");
+}
+
+/* ---------- live prices ---------- */
+async function fetchEsiJitaBuy(typeId) {
+  let page = 1, pages = 1; const all = [];
+  do {
+    const url = `https://esi.evetech.net/latest/markets/${CONFIG.forgeRegionId}/orders/?datasource=tranquility&order_type=buy&type_id=${typeId}&page=${page}`;
+    const res = await fetch(url, { cache: "no-store" });
+    if (!res.ok) throw new Error("ESI " + res.status);
+    pages = parseInt(res.headers.get("X-Pages") || "1", 10) || 1;
+    all.push(...await res.json());
+    page++;
+  } while (page <= pages && page <= 10);
+  return bestJitaBuy(all, CONFIG.jitaStationId);
+}
+async function fetchFuzzworkJitaBuy(typeIds) {
+  const url = `https://market.fuzzwork.co.uk/aggregates/?station=${CONFIG.jitaStationId}&types=${typeIds.join(",")}`;
+  const res = await fetch(url, { cache: "no-store" });
+  if (!res.ok) throw new Error("Fuzzwork " + res.status);
+  const data = await res.json(); const out = {};
+  for (const id of typeIds) { const v = parseFloat(data[id] && data[id].buy && data[id].buy.max); out[id] = v > 0 ? v : null; }
+  return out;
+}
+async function loadPrices() {
+  const ids = CONFIG.items.map(i => i.typeId);
+  let prices = {}, source = "EVE ESI";
+  try {
+    const vals = await Promise.all(ids.map(fetchEsiJitaBuy));
+    ids.forEach((id, i) => prices[id] = vals[i]);
+    if (ids.some(id => !prices[id])) throw new Error("missing");
+  } catch (e) {
+    try { prices = await fetchFuzzworkJitaBuy(ids); source = "Fuzzwork Market"; }
+    catch (e2) { return null; }
+    if (ids.some(id => !prices[id])) return null;
+  }
+  return { prices, source, at: new Date() };
+}
+
+/* ---------- render ---------- */
+const $ = id => document.getElementById(id);
+const state = { qty: { ...CONFIG.example }, example: true, live: null, loading: false };
+
+function renderStatic() {
+  $("hero-to").textContent = CONFIG.contractTo;
+  $("c-to").textContent = "Private → " + CONFIG.contractTo;
+  $("c-exp").textContent = CONFIG.expirationText;
+  $("step3").textContent = "Make a private item exchange contract to " + CONFIG.contractTo + " for the quoted ISK.";
+  $("foot-contact").textContent = "Questions: EVE-mail " + CONFIG.contractTo;
+
+  $("qty-grid").innerHTML = CONFIG.items.map(it => `
+    <div class="qty-row">
+      <span><label for="q-${it.key}">${it.name}</label></span>
+      <input type="text" inputmode="numeric" id="q-${it.key}" data-key="${it.key}" autocomplete="off">
+    </div>`).join("");
+
+  $("hub-select").innerHTML = CONFIG.hubs.map(h => `<option value="${h.sys}">${h.sys}${h.sec === "hs" ? "" : " (null)"}</option>`).join("");
+
+  $("hubs").innerHTML = CONFIG.hubs.map(h => `
+    <div class="panel hub">
+      <div class="sys">${h.sys}<span class="sec ${h.sec}">${h.sec === "hs" ? "HIGHSEC" : "NULLSEC"}</span></div>
+      <div class="where">${h.where}</div>
+    </div>`).join("");
+
+  const tol = Math.round(CONFIG.tolerance * 100);
+  const rules = [
+    `<strong>Item exchange, private to ${CONFIG.contractTo}.</strong> Public contracts, courier contracts and contracts to other characters are not accepted.`,
+    `<strong>Ask for the quoted ISK.</strong> Prices are live, so we check each contract against the quote when we review it. Contracts up to ${tol}% above the current quote are accepted. Anything higher is rejected and can be relisted at the new quote.`,
+    `<strong>Only Rocket Fuel, Plasmoids and Electrolytes.</strong> Keep other items out of the contract, or it will be rejected.`,
+    `<strong>Deliver to a listed hub.</strong> The contract location must be in one of the eight systems above. For nullsec systems, any station or structure works.`,
+    `<strong>Set expiration to ${CONFIG.expirationText}.</strong> That gives us time to accept during busy weeks.`,
+    `<strong>Rates can change.</strong> The percentage of Jita buy we pay may be adjusted as production grows.`
+  ];
+  $("rules").innerHTML = rules.map(r => `<li><span>${r}</span></li>`).join("");
+}
+
+function renderRates() {
+  $("rates").innerHTML = CONFIG.items.map(it => {
+    const has = !!it.jitaBuy, u = unitPay(it);
+    const note = it.rate > 1 ? "Paying above Jita buy" : "Live Jita buy × " + Math.round(it.rate * 100) + "%";
+    return `
+    <article class="rate ${it.cls}">
+      <div class="rate-head">
+        <div><h3>${it.name}</h3><div class="tier">${it.tier}</div></div>
+        <span class="pill">${Math.round(it.rate * 100)}% Jita buy</span>
+      </div>
+      <div class="pay">
+        <span class="label">We pay</span>
+        <span class="big">${has ? fmt(u) : "—"}<small>ISK / unit</small></span>
+      </div>
+      <dl class="facts">
+        <div><dt>Jita buy (live)</dt><dd>${has ? fmt(it.jitaBuy) : "—"}</dd></div>
+        <div><dt>Volume</dt><dd>${it.volume} m³</dd></div>
+        <div><dt>Per 1,000 units</dt><dd>${has ? shortIsk(u * 1000) : "—"}</dd></div>
+        <div><dt>Per 10k m³</dt><dd>${has ? shortIsk(u * 10000 / it.volume) : "—"}</dd></div>
+      </dl>
+      <span class="note-tag">${note}</span>
+    </article>`;
+  }).join("");
+}
+
+function syncInputs() {
+  for (const it of CONFIG.items) {
+    const v = state.qty[it.key] || 0;
+    $("q-" + it.key).value = v ? fmtInt(v) : "";
+  }
+}
+
+function renderQuote() {
+  const q = computeQuote(CONFIG.items, state.qty);
+  const active = q.lines.filter(l => l.qty > 0);
+  const priced = !!state.live;
+  $("lines").innerHTML = active.length
+    ? active.map(l => `<tr><td>${l.item.name}</td><td class="r">${fmtInt(l.qty)}</td><td class="r">${priced ? fmt(l.unit) : "—"}</td><td class="r">${priced ? fmtInt(l.subtotal) : "—"}</td></tr>`).join("")
+    : `<tr class="empty"><td colspan="4">Add items to see your quote.</td></tr>`;
+  $("total-isk").textContent = priced ? fmtInt(q.total) + " ISK" : (state.loading ? "Loading prices…" : "Prices unavailable");
+  const ex = state.example ? " · example quote, replace with your items" : "";
+  $("total-sub").textContent = fmt(Math.round(q.m3 * 100) / 100) + " m³ to deliver" + (priced && q.total ? " · " + shortIsk(q.total) + " ISK" : "") + ex;
+  $("c-isk").textContent = priced ? fmtInt(q.total) : "—";
+  const hub = $("hub-select").value || CONFIG.hubs[0].sys;
+  const parts = active.map(l => l.item.key.toUpperCase() + " " + fmtInt(l.qty));
+  const stamp = state.live ? eveStamp(state.live.at) + " EVE" : "";
+  $("c-desc").textContent = "Pyrotheon Buyback | " + (parts.length ? parts.join(" / ") : "no items") + " | " + hub + (stamp ? " | quoted " + stamp : "");
+  return q;
+}
+
+function setStatus(kind, text) {
+  $("live-dot").className = "dot " + kind;
+  $("asof-text").textContent = text;
+}
+
+async function refresh() {
+  if (state.loading) return;
+  state.loading = true; $("btn-refresh").disabled = true;
+  if (!state.live) setStatus("", "Loading live Jita prices…");
+  const r = await loadPrices();
+  state.loading = false; $("btn-refresh").disabled = false;
+  if (r) {
+    CONFIG.items.forEach(it => it.jitaBuy = r.prices[it.typeId]);
+    state.live = r;
+    setStatus("live", "Live Jita prices · " + eveTime(r.at));
+    $("banner").className = "banner";
+  } else if (state.live) {
+    setStatus("stale", "Could not refresh · prices from " + eveTime(state.live.at));
+  } else {
+    setStatus("stale", "Live prices unavailable");
+    const b = $("banner");
+    b.textContent = "We could not reach the EVE market feed. Check your connection and press Refresh. Quotes are paused until live prices load.";
+    b.className = "banner show";
+  }
+  renderRates(); renderQuote();
+}
+
+function flash(btn, text) {
+  const old = btn.textContent;
+  btn.textContent = text; btn.classList.add("copied");
+  setTimeout(() => { btn.textContent = old; btn.classList.remove("copied"); }, 1400);
+}
+
+function wire() {
+  $("qty-grid").addEventListener("input", e => {
+    const k = e.target.dataset.key; if (!k) return;
+    const n = parseInt(e.target.value.replace(/[^\d]/g, ""), 10);
+    state.qty[k] = isNaN(n) ? 0 : n; state.example = false;
+    renderQuote();
+  });
+  $("qty-grid").addEventListener("blur", syncInputs, true);
+  $("btn-parse").addEventListener("click", () => {
+    const r = parsePaste($("paste").value, CONFIG.items);
+    const msg = $("parse-msg");
+    if (!r.matched) {
+      msg.className = "parse-msg err";
+      msg.textContent = "No Rocket Fuel, Plasmoids or Electrolytes found. Copy them from your hangar and paste again.";
+      return;
+    }
+    state.qty = { rf: 0, pl: 0, el: 0, ...r.qty }; state.example = false;
+    syncInputs(); renderQuote();
+    msg.className = "parse-msg ok";
+    msg.textContent = "Read " + r.matched + " line" + (r.matched > 1 ? "s" : "") + "." + (r.unknown.length ? " Skipped " + r.unknown.length + " item" + (r.unknown.length > 1 ? "s" : "") + " we don't buy." : "");
+  });
+  $("btn-clear").addEventListener("click", () => {
+    $("paste").value = ""; state.qty = { rf: 0, pl: 0, el: 0 }; state.example = false;
+    $("parse-msg").textContent = ""; syncInputs(); renderQuote();
+  });
+  $("btn-refresh").addEventListener("click", refresh);
+  $("hub-select").addEventListener("change", renderQuote);
+  document.querySelectorAll("[data-copy]").forEach(btn => btn.addEventListener("click", async () => {
+    const which = btn.dataset.copy;
+    if (which === "isk" && !state.live) { flash(btn, "No prices yet"); return; }
+    const text = which === "to" ? CONFIG.contractTo : which === "isk" ? String(computeQuote(CONFIG.items, state.qty).total) : $("c-desc").textContent;
+    try { await navigator.clipboard.writeText(text); flash(btn, "Copied"); }
+    catch (err) { flash(btn, "Select & copy"); }
+  }));
+}
+
+renderStatic(); renderRates(); syncInputs(); renderQuote(); wire();
+refresh();
+setInterval(refresh, CONFIG.refreshMinutes * 60 * 1000);
+</script>
+</body>
+</html>
