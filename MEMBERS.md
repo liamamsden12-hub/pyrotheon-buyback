@@ -14,8 +14,11 @@ Run from the repo root (Node 20+). Each command asks for your own login first.
 | Add a member | `node tools/members.mjs add <username> "<Display Name>"` (add `--generate` to make up a password) |
 | Change a password | `node tools/members.mjs passwd <username>` |
 | Remove a member | `node tools/members.mjs remove <username>` |
-| List members | `node tools/members.mjs list` |
-| Edit the members page | `node tools/members.mjs open`, edit `members/_plain/content.html`, then `node tools/members.mjs seal` |
+| List members and pages | `node tools/members.mjs list` |
+| Add a sidebar page | `node tools/members.mjs add-page <slug> "<Title>" --icon=chart --after=home` |
+| Rename a page or change its icon | `node tools/members.mjs rename-page <slug> "<Title>" --icon=truck` |
+| Remove a page | `node tools/members.mjs remove-page <slug>` |
+| Edit pages or menu order | `node tools/members.mjs open`, edit `members/_plain/<slug>.html` (or reorder `nav.json`), then `node tools/members.mjs seal` |
 | Lock out everyone's old key | `node tools/members.mjs rotate` (issues new passwords to all) |
 
 After any change, commit and push `members/vault.json`. `members/_plain/` is
@@ -28,5 +31,7 @@ git-ignored on purpose. Never commit it.
   Generated ones are 23.
 - Removing a member stops their login. A member who dug the unlocked key out of
   their browser could still read later updates until you run `rotate`.
-- The members page is one HTML document. It can hold scripts (dashboards,
-  live ESI market pulls). `{{name}}` becomes the signed-in member's name.
+- Each sidebar page is its own HTML document, shown at `/members/#/<slug>`. It
+  can hold scripts (dashboards, live ESI market pulls). `{{name}}` becomes the
+  signed-in member's name. The menu itself (titles, order) is encrypted too.
+- Icons: home, chart, box, truck, flame, doc, users, gear, coins, target.

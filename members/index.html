@@ -13,7 +13,8 @@
 <style>
 /* Layout: a single full-height sign-in column over a deep-space backdrop
    (nebula, planet, light rays), after the Epic Hyperspace login. Once
-   signed in, a slim members bar sits over the decrypted members page. */
+   signed in, a left sidebar menu lists the members pages; the chosen
+   page fills the rest. On phones the sidebar becomes a slide-out drawer. */
 :root {
   --bg: #050911;
   --card: rgba(11, 19, 32, 0.94);
@@ -136,16 +137,66 @@ button u, .btn u { text-underline-offset: 2px; }
 
 .card footer { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; font-size: 11px; color: var(--ink-3); border-top: 1px solid var(--line); padding-top: 12px; }
 
-/* ---------- members shell ---------- */
-.shell { position: fixed; inset: 0; display: grid; grid-template-rows: auto 1fr; background: #070c14; }
-.bar { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 10px 18px; border-bottom: 1px solid var(--line); background: #0a1220; flex-wrap: wrap; }
-.bar .brand { display: flex; align-items: center; gap: 10px; }
-.bar .brand b { font-family: var(--font-display); font-weight: 700; letter-spacing: 0.18em; font-size: 14px; }
-.tag { font-family: var(--font-mono); font-size: 11px; padding: 2px 8px; border-radius: 999px; background: var(--ice-dim); color: var(--ice-strong); border: 1px solid rgba(124, 200, 255, 0.35); }
-.bar .who { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--ink-2); flex-wrap: wrap; }
-.bar .who strong { color: var(--ink); font-weight: 600; }
-.bar .btn, .bar button { padding: 6px 12px; font-size: 13px; }
-iframe.content { width: 100%; height: 100%; border: 0; display: block; background: #070c14; }
+/* ---------- members shell: sidebar menu + page ---------- */
+.shell { position: fixed; inset: 0; display: grid; grid-template-columns: 252px minmax(0, 1fr); background: #070c14; }
+.shell.collapsed { grid-template-columns: 68px minmax(0, 1fr); }
+.side { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; height: 100dvh; background: #0a1220; border-right: 1px solid var(--line); min-width: 0; }
+.side-top { display: flex; align-items: center; gap: 10px; padding: 16px 14px 14px 16px; border-bottom: 1px solid var(--line); min-width: 0; }
+.side-top .brand { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; }
+.side-top .brand svg { flex: none; }
+.side-top .name { display: grid; line-height: 1.2; min-width: 0; }
+.side-top b { font-family: var(--font-display); font-weight: 700; letter-spacing: 0.16em; font-size: 14px; white-space: nowrap; }
+.tag { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ice); white-space: nowrap; }
+.icon-btn { flex: none; width: 30px; height: 30px; padding: 0; display: grid; place-items: center; border-radius: 6px; background: transparent; border: 1px solid transparent; color: var(--ink-3); }
+.icon-btn:hover { color: var(--ink); border-color: var(--line); background: var(--panel-2); }
+.icon-btn svg { transition: transform .2s; }
+.side-nav { overflow-y: auto; overscroll-behavior: contain; padding: 14px 10px; scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
+.side-nav::-webkit-scrollbar { width: 6px; }
+.side-nav::-webkit-scrollbar-thumb { background: var(--line); border-radius: 3px; }
+.nav-label { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); padding: 0 10px 8px; }
+.side-nav ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.side-nav a, .side-foot a, .side-foot button {
+  position: relative; display: flex; align-items: center; gap: 12px; width: 100%;
+  padding: 9px 10px; border-radius: 8px; border: 0; background: transparent;
+  color: var(--ink-2); text-decoration: none; font: 500 14px var(--font-body); text-align: left; cursor: pointer;
+}
+.side-nav a:hover, .side-foot a:hover, .side-foot button:hover { background: var(--panel-2); color: var(--ink); }
+.side-nav a[aria-current="page"] { background: var(--ice-dim); color: var(--ice-strong); }
+.side-nav a[aria-current="page"]::before { content: ""; position: absolute; left: -10px; top: 7px; bottom: 7px; width: 3px; border-radius: 0 3px 3px 0; background: var(--ice); }
+.side svg.i { flex: none; width: 18px; height: 18px; }
+.lbl { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.side-foot { border-top: 1px solid var(--line); padding: 10px; display: grid; gap: 2px; }
+.me { display: flex; align-items: center; gap: 10px; padding: 8px 10px 10px; min-width: 0; }
+.avatar { flex: none; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font: 600 12px var(--font-display); color: #04121f; background: linear-gradient(135deg, var(--ice-strong), var(--ice) 60%, var(--ember)); }
+.me .who { display: grid; min-width: 0; line-height: 1.25; }
+.me .who strong { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.me .who span { font-size: 11px; color: var(--ink-3); }
+
+.shell.collapsed .lbl, .shell.collapsed .nav-label, .shell.collapsed .side-top .name, .shell.collapsed .me .who { display: none; }
+.shell.collapsed .side-top { flex-direction: column; padding: 14px 0; gap: 10px; }
+.shell.collapsed .side-top .brand { flex: none; }
+.shell.collapsed .icon-btn svg { transform: rotate(180deg); }
+.shell.collapsed .side-nav a, .shell.collapsed .side-foot a, .shell.collapsed .side-foot button, .shell.collapsed .me { justify-content: center; padding-left: 0; padding-right: 0; }
+
+.main { display: flex; flex-direction: column; min-width: 0; height: 100dvh; }
+.mobilebar { display: none; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1px solid var(--line); background: #0a1220; }
+.mobilebar strong { font-family: var(--font-display); font-weight: 600; font-size: 16px; }
+iframe.content { flex: 1 1 auto; min-height: 0; width: 100%; border: 0; display: block; background: #070c14; }
+.scrim { display: none; }
+
+@media (max-width: 820px) {
+  .shell, .shell.collapsed { grid-template-columns: minmax(0, 1fr); }
+  .side { position: fixed; z-index: 20; inset: 0 auto 0 0; width: min(280px, 86vw); transform: translateX(-102%); box-shadow: 0 0 60px rgba(0,0,0,.6); }
+  .shell.drawer .side { transform: none; }
+  .shell.drawer .scrim { display: block; position: fixed; inset: 0; z-index: 15; background: rgba(3, 6, 12, 0.6); }
+  .mobilebar { display: flex; }
+  #side-collapse { display: none; }
+  .shell.collapsed .lbl, .shell.collapsed .nav-label, .shell.collapsed .side-top .name, .shell.collapsed .me .who { display: revert; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .shell { transition: grid-template-columns .2s ease; }
+  .side { transition: transform .22s ease; }
+}
 
 @media (max-width: 520px) {
   .card { border: 0; padding-left: 22px; padding-right: 22px; }
@@ -197,23 +248,41 @@ iframe.content { width: 100%; height: 100%; border: 0; display: block; backgroun
 </div>
 
 <div class="shell" id="shell" hidden>
-  <div class="bar">
-    <div class="brand">
-      <svg width="24" height="24" viewBox="0 0 34 34" aria-hidden="true">
-        <defs><linearGradient id="g" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ffb36b"/><stop offset="0.55" stop-color="#7cc8ff"/><stop offset="1" stop-color="#a9dcff"/></linearGradient></defs>
-        <polygon points="17,2 31,10 31,24 17,32 3,24 3,10" fill="none" stroke="#1d2d44" stroke-width="1.5"/>
-        <path d="M17 7 C21 12 23 15 21.5 19 C21 17 19.5 16 18.5 15.5 C19 18.5 17.5 21 15 22.5 C15.5 20.5 14.5 19 13.2 18.2 C12.6 21 13.6 24.5 17 27 C11.5 26 9.5 21.5 10.5 17.5 C11.6 13 15.5 11 17 7 Z" fill="url(#g)"/>
-      </svg>
-      <b>PYROTHEON</b><span class="tag">Members</span>
+  <aside class="side" id="side" aria-label="Members menu">
+    <div class="side-top">
+      <div class="brand">
+        <svg width="26" height="26" viewBox="0 0 34 34" aria-hidden="true">
+          <defs><linearGradient id="g" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ffb36b"/><stop offset="0.55" stop-color="#7cc8ff"/><stop offset="1" stop-color="#a9dcff"/></linearGradient></defs>
+          <polygon points="17,2 31,10 31,24 17,32 3,24 3,10" fill="none" stroke="#1d2d44" stroke-width="1.5"/>
+          <path d="M17 7 C21 12 23 15 21.5 19 C21 17 19.5 16 18.5 15.5 C19 18.5 17.5 21 15 22.5 C15.5 20.5 14.5 19 13.2 18.2 C12.6 21 13.6 24.5 17 27 C11.5 26 9.5 21.5 10.5 17.5 C11.6 13 15.5 11 17 7 Z" fill="url(#g)"/>
+        </svg>
+        <span class="name"><b>PYROTHEON</b><span class="tag">Members terminal</span></span>
+      </div>
+      <button type="button" class="icon-btn" id="side-collapse" aria-label="Collapse menu" aria-expanded="true" title="Collapse menu">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+      </button>
     </div>
-    <div class="who">
-      <span>Signed in as <strong id="who-name"></strong></span>
-      <a class="btn" href="/">Buyback</a>
-      <button type="button" id="signout">Sign out</button>
+    <nav class="side-nav" aria-label="Members pages">
+      <div class="nav-label">Pages</div>
+      <ul id="nav"></ul>
+    </nav>
+    <div class="side-foot">
+      <div class="me"><span class="avatar" id="me-initials" aria-hidden="true"></span><span class="who"><strong id="who-name"></strong><span>Signed in</span></span></div>
+      <a href="/" title="PI Buyback"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg><span class="lbl">PI Buyback</span></a>
+      <button type="button" id="signout" title="Sign out"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h5v16h-5"/><path d="M10 8l-4 4 4 4"/><path d="M6 12h10"/></svg><span class="lbl">Sign out</span></button>
     </div>
+  </aside>
+  <div class="scrim" id="scrim"></div>
+  <div class="main">
+    <div class="mobilebar">
+      <button type="button" class="icon-btn" id="side-open" aria-label="Open menu" aria-controls="side" aria-expanded="false">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </button>
+      <strong id="page-title"></strong>
+    </div>
+    <iframe class="content" id="content" title="Members page"
+      sandbox="allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-downloads allow-top-navigation-by-user-activation"></iframe>
   </div>
-  <iframe class="content" id="content" title="Members area"
-    sandbox="allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-downloads allow-top-navigation-by-user-activation"></iframe>
 </div>
 
 <script>
@@ -221,7 +290,7 @@ iframe.content { width: 100%; height: 100%; border: 0; display: block; backgroun
    Sign-in. members/vault.json holds the members page encrypted with a
    master key; each account holds that key wrapped with a key derived
    from its password (PBKDF2-SHA256). A correct login unwraps the key
-   and decrypts the page right here. Accounts and content are managed
+   and decrypts the sidebar menu and pages right here. Accounts and content are managed
    with tools/members.mjs. Nothing secret is stored in this file.
    ==================================================================== */
 const VAULT_URL = "vault.json";
@@ -271,15 +340,83 @@ async function signIn(username, password) {
   try { return JSON.parse(await unseal(kek, entry, "user")); } catch { return null; }
 }
 
+/* ---------- members shell: sidebar menu ---------- */
+const ICONS = {
+  home: '<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/>',
+  chart: '<path d="M3 21h18"/><path d="M6 17V11"/><path d="M11 17V5"/><path d="M16 17v-4"/><path d="M21 17V8"/>',
+  box: '<path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5z"/><path d="M3 7.5 12 12l9-4.5"/><path d="M12 12v9"/>',
+  truck: '<path d="M2 6h12v10H2z"/><path d="M14 9h4l3 3v4h-7"/><circle cx="6" cy="18" r="2"/><circle cx="17" cy="18" r="2"/>',
+  flame: '<path d="M12 2c3 4 5 6.5 5 10a5 5 0 0 1-10 0c0-2 1-3.5 2-4.5 0 2 1 3 2 3 0-3-1-5 1-8.5z"/>',
+  doc: '<path d="M6 2h8l5 5v15H6z"/><path d="M14 2v5h5"/><path d="M9 13h7M9 17h7"/>',
+  users: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.5-3.5 3-5.5 6.5-5.5s6 2 6.5 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7"/><path d="M18 14.7c2 .6 3.2 2.4 3.5 5.3"/>',
+  gear: '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9 7 7M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/>',
+  coins: '<ellipse cx="9" cy="7" rx="6" ry="3"/><path d="M3 7v5c0 1.7 2.7 3 6 3s6-1.3 6-3V7"/><path d="M9 15v2c0 1.7 2.7 3 6 3s6-1.3 6-3v-5c0-1.7-2.7-3-6-3"/>',
+  target: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>'
+};
+const icon = name => `<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name] || ICONS.doc}</svg>`;
+const members = { session: null, master: null, vault: null, nav: [], cache: new Map(), current: null };
+const SIDE_KEY = "pyro.members.side";
+
 async function openContent(session) {
   const v = await getVault();
   const master = await subtle.importKey("raw", unb64(session.mk), "AES-GCM", false, ["decrypt"]);
-  const html = await unseal(master, v.content, "content");
-  $("content").srcdoc = html.split("{{name}}").join(esc(session.name));
+  const nav = JSON.parse(await unseal(master, v.nav, "nav"));
+  Object.assign(members, { session, master, vault: v, nav, cache: new Map(), current: null });
+  $("nav").innerHTML = nav.map(p =>
+    `<li><a href="#/${esc(p.slug)}" data-slug="${esc(p.slug)}" title="${esc(p.title)}">${icon(p.icon)}<span class="lbl">${esc(p.title)}</span></a></li>`).join("");
   $("who-name").textContent = session.name;
-  document.title = "Members · Pyrotheon Industries";
+  $("me-initials").textContent = session.name.split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0].toUpperCase()).join("");
+  const collapsed = readJSON("localStorage", SIDE_KEY) === "collapsed";
+  $("shell").classList.toggle("collapsed", collapsed);
+  $("side-collapse").setAttribute("aria-expanded", String(!collapsed));
   $("gate").hidden = true; $("shell").hidden = false;
+  await showPage();
 }
+
+async function pageHtml(p) {
+  if (!members.cache.has(p.id)) {
+    const html = await unseal(members.master, members.vault.pages[p.id], "page:" + p.id);
+    members.cache.set(p.id, html.split("{{name}}").join(esc(members.session.name)));
+  }
+  return members.cache.get(p.id);
+}
+
+/* The URL hash (#/slug) picks the page, so reloads and back/forward work. */
+async function showPage() {
+  if (!members.nav.length) return;
+  const slug = decodeURIComponent(location.hash.replace(/^#\/?/, ""));
+  const p = members.nav.find(n => n.slug === slug) || members.nav[0];
+  if (slug !== p.slug) history.replaceState(null, "", "#/" + p.slug);
+  document.querySelectorAll("#nav a").forEach(a => a.dataset.slug === p.slug ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current"));
+  $("page-title").textContent = p.title;
+  document.title = p.title + " · Members · Pyrotheon Industries";
+  setDrawer(false);
+  if (members.current === p.id) return;
+  members.current = p.id;
+  /* A fresh frame per page, so switching pages never adds frame history
+     and the browser Back button moves between pages. */
+  const html = await pageHtml(p);
+  const old = $("content"), frame = old.cloneNode(false);
+  frame.title = p.title; frame.srcdoc = html;
+  old.replaceWith(frame);
+}
+
+function setDrawer(open) {
+  $("shell").classList.toggle("drawer", open);
+  $("side-open").setAttribute("aria-expanded", String(open));
+  if (open) { const a = document.querySelector('#nav a[aria-current="page"]') || document.querySelector("#nav a"); if (a) a.focus(); }
+}
+window.addEventListener("hashchange", () => { if (members.session) showPage(); });
+$("side-open").addEventListener("click", () => setDrawer(true));
+$("scrim").addEventListener("click", () => setDrawer(false));
+$("side-collapse").addEventListener("click", () => {
+  const c = $("shell").classList.toggle("collapsed");
+  $("side-collapse").setAttribute("aria-expanded", String(!c));
+  $("side-collapse").setAttribute("aria-label", c ? "Expand menu" : "Collapse menu");
+  $("side-collapse").title = c ? "Expand menu" : "Collapse menu";
+  writeJSON("localStorage", SIDE_KEY, c ? "collapsed" : "open");
+});
+document.addEventListener("keydown", e => { if (e.key === "Escape" && $("shell").classList.contains("drawer")) { setDrawer(false); $("side-open").focus(); } });
 
 /* ---------- last login on this device (after the Epic status line) ---------- */
 function eveStamp(iso) {
@@ -333,7 +470,10 @@ document.addEventListener("keydown", e => {
 });
 $("signout").addEventListener("click", () => {
   drop("sessionStorage", SESSION_KEY);
-  $("content").srcdoc = ""; $("shell").hidden = true; $("gate").hidden = false;
+  Object.assign(members, { session: null, master: null, nav: [], cache: new Map(), current: null });
+  $("content").replaceWith($("content").cloneNode(false)); $("nav").innerHTML = ""; setDrawer(false);
+  history.replaceState(null, "", location.pathname); document.title = "Members · Pyrotheon Industries";
+  $("shell").hidden = true; $("gate").hidden = false;
   renderDevice(); setMsg("Signed out.", true); $("user").focus();
 });
 
