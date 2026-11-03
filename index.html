@@ -64,6 +64,8 @@ header.top .wrap { display: flex; align-items: center; justify-content: space-be
 .dot.live { background: var(--good); box-shadow: 0 0 0 3px rgba(111, 224, 168, 0.15); }
 .dot.stale { background: var(--ember); box-shadow: 0 0 0 3px rgba(255, 179, 107, 0.15); }
 .asof button { padding: 4px 10px; font-size: 12px; }
+.members-link { font: 600 12px var(--font-body); padding: 4px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel-2); color: var(--ink); text-decoration: none; }
+.members-link:hover { border-color: var(--ice); }
 .banner { display: none; margin-top: 14px; padding: 10px 14px; border-radius: 8px; border: 1px solid rgba(255, 179, 107, 0.4); background: var(--ember-dim); color: var(--ember); font-size: 14px; }
 .banner.show { display: block; }
 
@@ -211,7 +213,7 @@ footer { margin: 48px 0 36px; padding-top: 18px; border-top: 1px solid var(--lin
         <div class="brand-tag">Fire of the gods · PI Buyback</div>
       </div>
     </div>
-    <div class="asof"><span class="dot" id="live-dot" aria-hidden="true"></span><span id="asof-text" role="status" aria-live="polite">Loading live Jita prices…</span><button type="button" id="btn-refresh">Refresh</button></div>
+    <div class="asof"><span class="dot" id="live-dot" aria-hidden="true"></span><span id="asof-text" role="status" aria-live="polite">Loading live Jita prices…</span><button type="button" id="btn-refresh">Refresh</button><a class="members-link" href="/members/">Members</a></div>
   </div>
 </header>
 

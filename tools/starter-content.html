@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Members · Pyrotheon Industries</title>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Members home. Everything in this file is encrypted before it is published.
+   {{name}} is replaced with the signed-in member's display name. */
+:root {
+  --bg: #070c14; --panel: #0d1624; --panel-2: #111d2f; --line: #1d2d44;
+  --ink: #e6eef8; --ink-2: #9fb2c8; --ink-3: #6a7f98;
+  --ice: #7cc8ff; --ice-strong: #a9dcff; --ice-dim: rgba(124, 200, 255, 0.12);
+  --ember: #ffb36b; --good: #6fe0a8;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.55 "IBM Plex Sans", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+.wrap { max-width: 1040px; margin: 0 auto; padding: 36px 20px 48px; display: grid; gap: 28px; }
+h1, h2 { font-family: "Chakra Petch", sans-serif; margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(26px, 4vw, 36px); font-weight: 700; }
+h1 em { font-style: normal; color: var(--ice); }
+h2 { font-size: 20px; font-weight: 600; }
+p { margin: 0; color: var(--ink-2); }
+a { color: var(--ice); }
+.grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 14px; align-items: start; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 20px; display: grid; gap: 14px; }
+.notice { display: grid; gap: 4px; padding-top: 14px; border-top: 1px solid var(--line); }
+.notice:first-of-type { border-top: 0; padding-top: 0; }
+.notice .when { font: 12px "IBM Plex Mono", monospace; color: var(--ink-3); }
+.notice strong { font-weight: 600; }
+ul.links { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+ul.links a { display: flex; justify-content: space-between; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; text-decoration: none; background: var(--panel-2); }
+ul.links a:hover { border-color: var(--ice); }
+ul.links span { color: var(--ink-3); font-size: 13px; }
+.owner { border: 1px dashed rgba(255, 179, 107, 0.45); background: rgba(255, 179, 107, 0.06); }
+.owner h2 { color: var(--ember); font-size: 16px; }
+.owner code { font: 13px "IBM Plex Mono", monospace; color: var(--ink); }
+@media (max-width: 760px) { .grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div>
+    <h1>Welcome back, <em>{{name}}</em>.</h1>
+    <p>Pyrotheon Industries members terminal.</p>
+  </div>
+
+  <div class="grid">
+    <section class="panel" aria-labelledby="n-h">
+      <h2 id="n-h">Notices</h2>
+      <div class="notice">
+        <span class="when">2026-11-02</span>
+        <strong>Members terminal online.</strong>
+        <p>This area is encrypted. Only a valid member login can open it.</p>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="l-h">
+      <h2 id="l-h">Quick links</h2>
+      <ul class="links">
+        <li><a href="/" target="_top">PI Buyback <span>public page</span></a></li>
+      </ul>
+    </section>
+  </div>
+
+  <section class="panel owner" aria-labelledby="o-h">
+    <h2 id="o-h">Starter page</h2>
+    <p>This is placeholder content. Replace it with whatever belongs behind the login: dashboards, doctrine supply sheets, partner pricing, notices. Edit with <code>node tools/members.mjs open</code>, then <code>seal</code>.</p>
+  </section>
+</main>
+</body>
+</html>

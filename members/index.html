@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Members · Pyrotheon Industries</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#070c14">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 34 34'%3E%3Cpath d='M17 3 C22 9 25 14 22.5 19.5 C21.5 17 19.5 16 18.5 15.5 C19 18.5 17.5 21 15 22.5 C15.5 20.5 14.5 19 13.2 18.2 C12.6 21 13.6 24.5 17 28 C10.5 27 8.5 21.5 9.5 17 C10.6 12 15.5 9 17 3 Z' fill='%237cc8ff'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,500;0,600;0,700;1,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Layout: a single full-height sign-in column over a deep-space backdrop
+   (nebula, planet, light rays), after the Epic Hyperspace login. Once
+   signed in, a slim members bar sits over the decrypted members page. */
+:root {
+  --bg: #050911;
+  --card: rgba(11, 19, 32, 0.94);
+  --panel-2: #111d2f;
+  --line: #1d2d44;
+  --ink: #e6eef8;
+  --ink-2: #9fb2c8;
+  --ink-3: #6a7f98;
+  --ice: #7cc8ff;
+  --ice-strong: #a9dcff;
+  --ice-dim: rgba(124, 200, 255, 0.12);
+  --ember: #ffb36b;
+  --ember-dim: rgba(255, 179, 107, 0.12);
+  --good: #6fe0a8;
+  --font-display: "Chakra Petch", "Segoe UI", sans-serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font: 15px/1.5 var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+:focus-visible { outline: 2px solid var(--ice); outline-offset: 2px; }
+[hidden] { display: none !important; }
+
+/* ---------- backdrop ---------- */
+.sky { position: fixed; inset: 0; overflow: hidden; pointer-events: none;
+  background:
+    radial-gradient(900px 600px at 12% 78%, rgba(124, 200, 255, 0.28), transparent 60%),
+    radial-gradient(700px 520px at 30% 10%, rgba(120, 92, 220, 0.30), transparent 62%),
+    radial-gradient(800px 560px at 88% 92%, rgba(255, 140, 90, 0.26), transparent 60%),
+    radial-gradient(600px 420px at 70% 40%, rgba(196, 92, 170, 0.20), transparent 65%),
+    linear-gradient(180deg, #0a1024 0%, #0b0f22 45%, #120d1e 100%);
+}
+.stars { position: absolute; inset: 0; opacity: .75;
+  background-image:
+    radial-gradient(1px 1px at 20px 30px, #fff, transparent),
+    radial-gradient(1px 1px at 140px 80px, rgba(255,255,255,.8), transparent),
+    radial-gradient(1.5px 1.5px at 260px 160px, #fff, transparent),
+    radial-gradient(1px 1px at 330px 40px, rgba(255,255,255,.7), transparent),
+    radial-gradient(1px 1px at 90px 220px, rgba(169,220,255,.9), transparent),
+    radial-gradient(1px 1px at 200px 260px, rgba(255,255,255,.6), transparent),
+    radial-gradient(1.5px 1.5px at 380px 240px, rgba(255,214,170,.9), transparent);
+  background-size: 420px 300px;
+}
+.rays { position: absolute; left: -18vw; top: 50%; width: 70vw; height: 70vw; transform: translateY(-50%);
+  background: repeating-conic-gradient(from 0deg, rgba(169, 220, 255, 0.10) 0deg 2deg, transparent 2deg 9deg);
+  -webkit-mask: radial-gradient(circle, #000 0, rgba(0,0,0,.6) 18%, transparent 62%);
+          mask: radial-gradient(circle, #000 0, rgba(0,0,0,.6) 18%, transparent 62%);
+}
+.planet { position: absolute; right: -60px; top: 9vh; width: 240px; height: 240px; border-radius: 50%;
+  background: radial-gradient(circle at 34% 30%, #d9efff 0%, #8cc7f0 16%, #3b6c9e 44%, #172a4a 72%, #0b1426 100%);
+  box-shadow: 0 0 60px 8px rgba(124, 200, 255, 0.25), inset -30px -20px 60px rgba(5, 9, 17, 0.7);
+  opacity: .9;
+}
+.planet::after { content: ""; position: absolute; inset: 0; border-radius: 50%;
+  background: repeating-linear-gradient(170deg, rgba(255,255,255,.06) 0 6px, transparent 6px 18px); mix-blend-mode: overlay; }
+
+/* ---------- sign-in column ---------- */
+.gate { position: relative; height: 100dvh; display: grid; justify-items: center; }
+.card {
+  width: min(440px, 100%); height: 100%;
+  background: var(--card);
+  border-left: 1px solid var(--line); border-right: 1px solid var(--line);
+  box-shadow: 0 0 80px rgba(0, 0, 0, 0.55);
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  display: grid; grid-template-rows: auto 1fr auto; grid-template-columns: minmax(0, 1fr);
+  padding: clamp(36px, 11vh, 110px) 34px 22px;
+  overflow-y: auto;
+}
+.mark { display: grid; justify-items: center; gap: 2px; }
+.wordmark {
+  font-family: var(--font-display); font-style: italic; font-weight: 700;
+  font-size: clamp(42px, 12.5vw, 56px); line-height: 1; letter-spacing: -0.01em;
+  background: linear-gradient(180deg, var(--ice-strong) 0%, var(--ice) 55%, #4d97d1 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  filter: drop-shadow(0 6px 24px rgba(124, 200, 255, 0.25));
+  padding-right: .08em; /* room for the italic overhang */
+}
+.product { font-family: var(--font-display); font-weight: 500; font-size: 15px; letter-spacing: 0.52em; color: var(--ink-2); margin-right: -0.52em; margin-top: 10px; }
+.build { justify-self: end; font-size: 11px; color: var(--ink-3); margin-top: 2px; margin-right: 8%; }
+
+form.login { align-self: center; display: grid; gap: 14px; padding: 28px 0 12px; }
+.row { display: grid; grid-template-columns: 82px 1fr; gap: 10px; align-items: center; }
+.row label { text-align: right; font-size: 13px; font-weight: 600; color: var(--ink-2); }
+.field { position: relative; }
+.field input {
+  width: 100%; background: #08111d; color: var(--ink);
+  border: 1px solid var(--line); border-radius: 6px;
+  font: 15px/1.4 var(--font-mono); padding: 9px 34px 9px 11px;
+}
+.field input:focus { border-color: var(--ice); outline: none; box-shadow: 0 0 0 3px var(--ice-dim); }
+.field .flag {
+  position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+  width: 15px; height: 15px; border-radius: 50%; background: var(--ember); color: #1a0d00;
+  font: 700 11px/15px var(--font-body); text-align: center; display: none;
+}
+.field.invalid input { border-color: rgba(255, 179, 107, 0.7); }
+.field.invalid .flag { display: block; }
+.msg { min-height: 1.4em; font-size: 13px; color: var(--ember); text-align: center; }
+.msg.ok { color: var(--good); }
+
+.buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 18px; }
+button, .btn {
+  font: 600 14px var(--font-body); border-radius: 6px; padding: 10px 14px; cursor: pointer;
+  border: 1px solid var(--line); background: var(--panel-2); color: var(--ink); text-align: center; text-decoration: none;
+}
+button:hover, .btn:hover { border-color: var(--ice); }
+button.primary { background: var(--ice); color: #04121f; border-color: var(--ice); }
+button.primary:hover { background: var(--ice-strong); }
+button:disabled { opacity: .65; cursor: progress; }
+button u, .btn u { text-underline-offset: 2px; }
+.lastlogin { font-size: 11px; color: var(--ink-3); text-align: center; margin-top: 4px; text-wrap: balance; }
+
+.card footer { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; font-size: 11px; color: var(--ink-3); border-top: 1px solid var(--line); padding-top: 12px; }
+
+/* ---------- members shell ---------- */
+.shell { position: fixed; inset: 0; display: grid; grid-template-rows: auto 1fr; background: #070c14; }
+.bar { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 10px 18px; border-bottom: 1px solid var(--line); background: #0a1220; flex-wrap: wrap; }
+.bar .brand { display: flex; align-items: center; gap: 10px; }
+.bar .brand b { font-family: var(--font-display); font-weight: 700; letter-spacing: 0.18em; font-size: 14px; }
+.tag { font-family: var(--font-mono); font-size: 11px; padding: 2px 8px; border-radius: 999px; background: var(--ice-dim); color: var(--ice-strong); border: 1px solid rgba(124, 200, 255, 0.35); }
+.bar .who { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--ink-2); flex-wrap: wrap; }
+.bar .who strong { color: var(--ink); font-weight: 600; }
+.bar .btn, .bar button { padding: 6px 12px; font-size: 13px; }
+iframe.content { width: 100%; height: 100%; border: 0; display: block; background: #070c14; }
+
+@media (max-width: 520px) {
+  .card { border: 0; padding-left: 22px; padding-right: 22px; }
+  .row { grid-template-columns: 1fr; gap: 6px; }
+  .row label { text-align: left; }
+  .planet { width: 160px; height: 160px; right: -50px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  button, input { transition: border-color .15s, box-shadow .15s, background .15s; }
+  .card { animation: rise .45s ease-out both; }
+  @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+}
+</style>
+</head>
+<body>
+
+<div class="sky" aria-hidden="true"><div class="stars"></div><div class="rays"></div><div class="planet"></div></div>
+
+<div class="gate" id="gate">
+  <div class="card">
+    <div class="mark">
+      <div class="wordmark" aria-label="Pyrotheon">PYROTHEON</div>
+      <div class="product">INDUSTRIES</div>
+      <div class="build">Members Terminal · November 2026</div>
+    </div>
+
+    <form class="login" id="login" novalidate autocomplete="on">
+      <div class="row">
+        <label for="user">User ID:</label>
+        <div class="field" id="f-user"><input id="user" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" required><span class="flag" aria-hidden="true">!</span></div>
+      </div>
+      <div class="row">
+        <label for="pass">Password:</label>
+        <div class="field" id="f-pass"><input id="pass" name="password" type="password" autocomplete="current-password" required><span class="flag" aria-hidden="true">!</span></div>
+      </div>
+      <div class="msg" id="msg" role="alert" aria-live="assertive"></div>
+      <div class="buttons">
+        <button type="submit" class="primary" id="go"><u>C</u>ontinue</button>
+        <a class="btn" href="/" id="cancel">C<u>a</u>ncel</a>
+      </div>
+      <div class="lastlogin" id="lastlogin"></div>
+    </form>
+
+    <footer>
+      <span>Pyrotheon Industries · Brave</span>
+      <span>Encrypted members area</span>
+    </footer>
+  </div>
+</div>
+
+<div class="shell" id="shell" hidden>
+  <div class="bar">
+    <div class="brand">
+      <svg width="24" height="24" viewBox="0 0 34 34" aria-hidden="true">
+        <defs><linearGradient id="g" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ffb36b"/><stop offset="0.55" stop-color="#7cc8ff"/><stop offset="1" stop-color="#a9dcff"/></linearGradient></defs>
+        <polygon points="17,2 31,10 31,24 17,32 3,24 3,10" fill="none" stroke="#1d2d44" stroke-width="1.5"/>
+        <path d="M17 7 C21 12 23 15 21.5 19 C21 17 19.5 16 18.5 15.5 C19 18.5 17.5 21 15 22.5 C15.5 20.5 14.5 19 13.2 18.2 C12.6 21 13.6 24.5 17 27 C11.5 26 9.5 21.5 10.5 17.5 C11.6 13 15.5 11 17 7 Z" fill="url(#g)"/>
+      </svg>
+      <b>PYROTHEON</b><span class="tag">Members</span>
+    </div>
+    <div class="who">
+      <span>Signed in as <strong id="who-name"></strong></span>
+      <a class="btn" href="/">Buyback</a>
+      <button type="button" id="signout">Sign out</button>
+    </div>
+  </div>
+  <iframe class="content" id="content" title="Members area"
+    sandbox="allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-downloads allow-top-navigation-by-user-activation"></iframe>
+</div>
+
+<script>
+/* ====================================================================
+   Sign-in. members/vault.json holds the members page encrypted with a
+   master key; each account holds that key wrapped with a key derived
+   from its password (PBKDF2-SHA256). A correct login unwraps the key
+   and decrypts the page right here. Accounts and content are managed
+   with tools/members.mjs. Nothing secret is stored in this file.
+   ==================================================================== */
+const VAULT_URL = "vault.json";
+const SESSION_KEY = "pyro.members.session";
+const DEVICE_KEY = "pyro.members.device";
+const subtle = crypto.subtle;
+const enc = new TextEncoder(), dec = new TextDecoder();
+const $ = id => document.getElementById(id);
+
+const unb64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+const b64 = bytes => btoa(String.fromCharCode(...bytes));
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const normUser = u => String(u || "").trim().toLowerCase();
+
+function store(kind) { try { return window[kind]; } catch { return null; } }
+function readJSON(kind, key) { try { return JSON.parse(store(kind).getItem(key)); } catch { return null; } }
+function writeJSON(kind, key, val) { try { store(kind).setItem(key, JSON.stringify(val)); } catch {} }
+function drop(kind, key) { try { store(kind).removeItem(key); } catch {} }
+
+async function userId(u) {
+  const h = await subtle.digest("SHA-256", enc.encode("pyrotheon-members:" + normUser(u)));
+  return [...new Uint8Array(h)].map(b => b.toString(16).padStart(2, "0")).join("");
+}
+async function deriveKek(password, salt, iterations) {
+  const base = await subtle.importKey("raw", enc.encode(password), "PBKDF2", false, ["deriveKey"]);
+  return subtle.deriveKey({ name: "PBKDF2", hash: "SHA-256", salt, iterations }, base, { name: "AES-GCM", length: 256 }, false, ["decrypt"]);
+}
+async function unseal(key, box, aad) {
+  const pt = await subtle.decrypt({ name: "AES-GCM", iv: unb64(box.iv), additionalData: enc.encode(aad) }, key, unb64(box.ct));
+  return dec.decode(pt);
+}
+let vaultPromise = null;
+function getVault() {
+  if (!vaultPromise) vaultPromise = fetch(VAULT_URL, { cache: "no-store" }).then(r => { if (!r.ok) throw new Error("vault " + r.status); return r.json(); });
+  vaultPromise.catch(() => { vaultPromise = null; });
+  return vaultPromise;
+}
+
+/* Returns { mk, name, u } on success, null on a bad login. */
+async function signIn(username, password) {
+  const v = await getVault();
+  const entry = v.users[await userId(username)];
+  /* Unknown user: still spend the same derivation time, so both failures look alike. */
+  const salt = entry ? unb64(entry.salt) : crypto.getRandomValues(new Uint8Array(16));
+  const kek = await deriveKek(password, salt, entry ? entry.iterations : v.kdf.iterations);
+  if (!entry) return null;
+  try { return JSON.parse(await unseal(kek, entry, "user")); } catch { return null; }
+}
+
+async function openContent(session) {
+  const v = await getVault();
+  const master = await subtle.importKey("raw", unb64(session.mk), "AES-GCM", false, ["decrypt"]);
+  const html = await unseal(master, v.content, "content");
+  $("content").srcdoc = html.split("{{name}}").join(esc(session.name));
+  $("who-name").textContent = session.name;
+  document.title = "Members · Pyrotheon Industries";
+  $("gate").hidden = true; $("shell").hidden = false;
+}
+
+/* ---------- last login on this device (after the Epic status line) ---------- */
+function eveStamp(iso) {
+  const d = new Date(iso);
+  const day = d.toLocaleDateString("en-US", { weekday: "short", timeZone: "UTC" });
+  return day + " " + d.toISOString().slice(0, 10) + " " + d.toISOString().slice(11, 16) + " EVE";
+}
+function renderDevice() {
+  const d = readJSON("localStorage", DEVICE_KEY);
+  const el = $("lastlogin");
+  if (!d || !d.last) { el.textContent = d && d.failed ? "Failed login attempts on this device: " + d.failed : ""; return; }
+  el.textContent = "Last login " + eveStamp(d.last) + (d.who ? " as " + d.who : "") + ". Failed login attempts since last login: " + (d.failed || 0);
+}
+function noteFailure() { const d = readJSON("localStorage", DEVICE_KEY) || {}; d.failed = (d.failed || 0) + 1; writeJSON("localStorage", DEVICE_KEY, d); renderDevice(); }
+function noteSuccess(u) { writeJSON("localStorage", DEVICE_KEY, { last: new Date().toISOString(), who: u, failed: 0 }); }
+
+/* ---------- wiring ---------- */
+function setMsg(text, ok) { const m = $("msg"); m.textContent = text; m.className = "msg" + (ok ? " ok" : ""); }
+
+$("login").addEventListener("submit", async e => {
+  e.preventDefault();
+  const u = $("user").value, p = $("pass").value;
+  $("f-user").classList.toggle("invalid", !u.trim());
+  $("f-pass").classList.toggle("invalid", !p);
+  if (!u.trim() || !p) { setMsg("Enter your user ID and password."); (!u.trim() ? $("user") : $("pass")).focus(); return; }
+  const go = $("go"); go.disabled = true; go.textContent = "Verifying…"; setMsg("");
+  try {
+    const s = await signIn(u, p);
+    if (!s) {
+      noteFailure();
+      $("f-pass").classList.add("invalid");
+      setMsg("Login failed. Check your user ID and password.");
+      $("pass").select();
+      return;
+    }
+    noteSuccess(normUser(u));
+    writeJSON("sessionStorage", SESSION_KEY, s);
+    $("pass").value = "";
+    await openContent(s);
+  } catch (err) {
+    setMsg("Could not reach the members vault. Check your connection and try again.");
+  } finally {
+    go.disabled = false; go.innerHTML = "<u>C</u>ontinue";
+  }
+});
+["user", "pass"].forEach(id => $(id).addEventListener("input", () => $("f-" + id).classList.remove("invalid")));
+document.addEventListener("keydown", e => {
+  if (!$("gate").hidden && e.key === "Escape") location.href = "/";
+  if (!$("gate").hidden && e.altKey && (e.key === "c" || e.key === "C")) { e.preventDefault(); $("login").requestSubmit(); }
+  if (!$("gate").hidden && e.altKey && (e.key === "a" || e.key === "A")) { e.preventDefault(); location.href = "/"; }
+});
+$("signout").addEventListener("click", () => {
+  drop("sessionStorage", SESSION_KEY);
+  $("content").srcdoc = ""; $("shell").hidden = true; $("gate").hidden = false;
+  renderDevice(); setMsg("Signed out.", true); $("user").focus();
+});
+
+/* Stay signed in for this tab across reloads; closing the tab signs out. */
+(async () => {
+  renderDevice();
+  getVault().catch(() => {});
+  const s = readJSON("sessionStorage", SESSION_KEY);
+  if (s && s.mk) {
+    try { await openContent(s); return; }
+    catch { drop("sessionStorage", SESSION_KEY); }
+  }
+  $("user").focus();
+})();
+</script>
+</body>
+</html>
